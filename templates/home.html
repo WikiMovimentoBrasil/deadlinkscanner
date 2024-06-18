@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _("Homepage") }}{% endblock %}
+{% block content %}
+    <div class='w3-container'>
+        <div class="w3-third disappear">&nbsp;</div>
+        <div class="w3-third content">
+            <h1>{{ _("Dead Link Scanner") }}</h1>
+            <p>{{ _('This application is meant to return a list of pages in a given category of a Wikimedia Project, with the information of which external links are dead in each page.') }}</p>
+            <p>{% trans %}It was inspired by a wish of the <b><a href="https://w.wiki/6o7Q" title="MetaWiki page of the Lusophone technological wishlist project">Lusophone technological wishlist</a></b> and was partially developed in an <b><a href="https://www.outreachy.org" title="homepage for the Outreachy initiative">Outreachy project</a></b>.{% endtrans %}</p>
+            <form action="{{ url_for('submit') }}" method="post" class="submit_form">
+                <div class="form_field">
+                    <label class="field_label" for="category_url">{{ _("Category URL") }}*</label>
+                    <span class="field_description">{{ _("Type or paste the URL of the category page of a Wikimedia project") }}</span>
+                    <input class="cdx-text-input__input" type="url" name="category_url" id="category_url" aria-required="true" required />
+                </div>
+                <div class="form_field">
+                    <label class="field_label" for="depth">{{ _("Depth of subcategories") }}*</label>
+                    <span class="field_description">{{ _("Choose the depth of subcategories the tool should look.<br>The higher the number, the longer it takes to retrieve all external links.") }}</span>
+                    <input id="depth" name="depth" class="cdx-text-input__input" type="number" min="0" max="2" value="0">
+                </div>
+                <div class="form_field">
+                    <span class="field_label">{{ _('Submit your request') }}</span>
+                    <span class="field_description">{{ _("After submitting your request, please wait until it is finished before leaving this page.") }}</span>
+                    <input class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" type="submit" value="{{ _('Submit') }}" />
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block footer %}
+    <div class='w3-third disappear'>&nbsp;</div>
+    <div class='w3-third content'>
+        <p class="field_description">
+            {% trans %}This application was developed by the <a href="https://w.wiki/Lrx" title="MetaWiki page of the User Group Wiki Movimento Brasil">Wiki Movimento Brasil</a>.<br>Texts are licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0" title="Creative Commons Attribution-ShareALike 4.0 International">CC BY-SA 4.0</a>.<br>The source code is licensed under the <a href="https://opensource.org/license/mit" title="The MIT License">MIT license</a>.{% endtrans %}
+        </p>
+    </div>
+{% endblock %}

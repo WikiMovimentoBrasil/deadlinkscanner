@@ -1,0 +1,7 @@
+Flask[async]
+pyyaml
+flask_babel
+httpx
+requests
+aiohttp
+pandas

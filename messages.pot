@@ -1,0 +1,123 @@
+# Translations template for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-06-17 21:05-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: link_checker.py:90
+msgid "Bad request"
+msgstr ""
+
+#: link_checker.py:92
+msgid "Unauthorized"
+msgstr ""
+
+#: link_checker.py:94
+msgid "Forbidden"
+msgstr ""
+
+#: link_checker.py:96
+msgid "Not found"
+msgstr ""
+
+#: link_checker.py:98
+msgid "Unable to connect"
+msgstr ""
+
+#: templates/home.html:3 templates/navbar.html:2
+msgid "Homepage"
+msgstr ""
+
+#: templates/home.html:8 templates/navbar.html:11
+msgid "Dead Link Scanner"
+msgstr ""
+
+#: templates/home.html:9
+msgid ""
+"This application is meant to return a list of pages in a given "
+"category of a Wikimedia Project, with the information of which "
+"external links are dead in each page."
+msgstr ""
+
+#: templates/home.html:10
+msgid ""
+"It was inspired by a wish of the <b><a href=\"https://w.wiki/6o7Q\" "
+"title=\"MetaWiki page of the Lusophone technological wishlist "
+"project\">Lusophone technological wishlist</a></b> and was partially "
+"developed in an <b><a href=\"https://www.outreachy.org\" title=\"homepage"
+" for the Outreachy initiative\">Outreachy project</a></b>."
+msgstr ""
+
+#: templates/home.html:13
+msgid "Category URL"
+msgstr ""
+
+#: templates/home.html:14
+msgid "Type or paste the URL of the category page of a Wikimedia project"
+msgstr ""
+
+#: templates/home.html:18
+msgid "Depth of subcategories"
+msgstr ""
+
+#: templates/home.html:19
+msgid ""
+"Choose the depth of subcategories the tool should look.<br>The higher the"
+" number, the longer it takes to retrieve all external links."
+msgstr ""
+
+#: templates/home.html:23
+msgid "Submit your request"
+msgstr ""
+
+#: templates/home.html:24
+msgid ""
+"After submitting your request, please wait until it is finished before "
+"leaving this page."
+msgstr ""
+
+#: templates/home.html:25
+msgid "Submit"
+msgstr ""
+
+#: templates/home.html:35
+msgid ""
+"This application was developed by the <a href=\"https://w.wiki/Lrx\" "
+"title=\"MetaWiki page of the User Group Wiki Movimento Brasil\">Wiki "
+"Movimento Brasil</a>.<br>Texts are licensed under <a "
+"href=\"https://creativecommons.org/licenses/by-sa/4.0\" title=\"Creative "
+"Commons Attribution-ShareALike 4.0 International\">CC BY-SA "
+"4.0</a>.<br>The source code is licensed under the <a "
+"href=\"https://opensource.org/license/mit\" title=\"The MIT License\">MIT"
+" license</a>."
+msgstr ""
+
+#: templates/navbar.html:12
+msgid "DLS"
+msgstr ""
+
+#: templates/navbar.html:16
+msgid "Your Wikimedia account"
+msgstr ""
+
+#: templates/navbar.html:19 templates/navbar.html:20
+msgid "Logout"
+msgstr ""
+
+#: templates/navbar.html:24 templates/navbar.html:25
+msgid "Login"
+msgstr ""
+
