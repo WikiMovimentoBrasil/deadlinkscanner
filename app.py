@@ -158,14 +158,13 @@ def trigger_category_pages():
 async def external_links(category_url, get_subcategories, depth):
     page_titles, page_titles_status_code = await category_pages(category_url, get_subcategories, depth)
     if not page_titles:
-        return jsonify({'error': 'No page titles provided'}), 400
-
+        return {}, 400
     try:
         results = await get_external_links_batch(category_url, page_titles)
         response_data = {title: links for title, links in results}
         return response_data, 200
     except Exception as e:
-        return jsonify({'error': 'No external link retrieved'}), 400
+        return {}, 400
 
 
 @app.route('/external_links', methods=['GET'])
