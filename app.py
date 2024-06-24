@@ -85,50 +85,51 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/', methods=('GET', 'POST'))
+@app.route('/', methods=['GET'])
 def index():
     username = session.get('username', None)
-    if request.method == 'POST':
-        data = request.form['category_url']
-        return render_template('home.html', message=f'Form submitted with: {data}', username=username)
     return render_template('home.html', title='Home', username=username)
 
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    category_url = unquote(request.form.get('category_url'))
-    depth = request.form.get('depth', type=int, default=0)
-    offset = request.form.get('offset', type=int, default=0)
-    project, category_page = get_category_project_and_category_name(category_url)
-    category_name = category_page.split(':', 1)[1]
+    username = session.get('username', None)
+    if not username:
+        return redirect(url_for('login'))
+    else:
+        category_url = unquote(request.form.get('category_url'))
+        depth = request.form.get('depth', type=int, default=0)
+        offset = request.form.get('offset', type=int, default=0)
+        project, category_page = get_category_project_and_category_name(category_url)
+        category_name = category_page.split(':', 1)[1]
 
-    task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
+        task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
 
-    pages = []
-    links = []
-    status_codes = []
-    status_messages = []
+        pages = []
+        links = []
+        status_codes = []
+        status_messages = []
 
-    for page, page_links in task.items():
-        for detail in page_links:
-            pages.append(page)
-            links.append(detail['link'])
-            status_codes.append(detail['status_code'])
-            status_messages.append(detail['status_message'])
+        for page, page_links in task.items():
+            for detail in page_links:
+                pages.append(page)
+                links.append(detail['link'])
+                status_codes.append(detail['status_code'])
+                status_messages.append(detail['status_message'])
 
-    df = pd.DataFrame({
-        'File': pages,
-        'Link': links,
-        'Status Code': status_codes,
-        'Status Message': status_messages
-    })
+        df = pd.DataFrame({
+            'File': pages,
+            'Link': links,
+            'Status Code': status_codes,
+            'Status Message': status_messages
+        })
 
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.csv')
-    df.to_csv(temp_file.name, index=False)
-    response = send_file(temp_file.name, as_attachment=True, download_name=f'{category_name}.csv')
-    temp_file.close()
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.csv')
+        df.to_csv(temp_file.name, index=False)
+        response = send_file(temp_file.name, as_attachment=True, download_name=f'{category_name}.csv')
+        temp_file.close()
 
-    return response
+        return response
 
 
 def get_url_parameters(args):
@@ -152,13 +153,17 @@ async def category_pages(category_url, depth):
 
 @app.route('/category_pages', methods=['GET'])
 def trigger_category_pages():
-    category_url, depth, offset = get_url_parameters(request.args)
-    if not category_url:
-        return jsonify({'error': 'Category URL parameter is required'}), 400
+    username = session.get('username', None)
+    if not username:
+        return redirect(url_for('login'))
+    else:
+        category_url, depth, offset = get_url_parameters(request.args)
+        if not category_url:
+            return jsonify({'error': 'Category URL parameter is required'}), 400
 
-    task, task_status_code = asyncio.run(category_pages(category_url, depth))
+        task, task_status_code = asyncio.run(category_pages(category_url, depth))
 
-    return task
+        return task
 
 
 async def external_links(category_url, depth):
@@ -183,13 +188,17 @@ async def external_links(category_url, depth):
 
 @app.route('/external_links', methods=['GET'])
 def trigger_external_links():
-    category_url, depth, offset = get_url_parameters(request.args)
-    if not category_url:
-        return jsonify({'error': 'Category URL parameter is required'}), 400
+    username = session.get('username', None)
+    if not username:
+        redirect(url_for('login'))
+    else:
+        category_url, depth, offset = get_url_parameters(request.args)
+        if not category_url:
+            return jsonify({'error': 'Category URL parameter is required'}), 400
 
-    task, task_status_code = asyncio.run(external_links(category_url, depth))
+        task, task_status_code = asyncio.run(external_links(category_url, depth))
 
-    return task
+        return task
 
 
 async def count_external_links(category_url, depth):
@@ -246,13 +255,17 @@ async def check_links(category_url, depth, offset):
 
 @app.route('/check_links', methods=['GET'])
 def trigger_check_links():
-    category_url, depth, offset = get_url_parameters(request.args)
-    if not category_url:
-        return jsonify({'error': 'Category URL parameter is required'}), 400
+    username = session.get('username', None)
+    if not username:
+        redirect(url_for('login'))
+    else:
+        category_url, depth, offset = get_url_parameters(request.args)
+        if not category_url:
+            return jsonify({'error': 'Category URL parameter is required'}), 400
 
-    task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
+        task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
 
-    return task
+        return task
 
 
 def reconcile_results(urls_per_page, broken_links):
@@ -262,4 +275,4 @@ def reconcile_results(urls_per_page, broken_links):
 
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run()
