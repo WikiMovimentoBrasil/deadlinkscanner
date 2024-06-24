@@ -6,6 +6,7 @@ import time
 import asyncio
 import pandas as pd
 import tempfile
+from urllib.parse import unquote
 from flask import Flask, jsonify, request, render_template, send_file, redirect, url_for, session, flash
 from flask_babel import Babel
 from link_checker import get_pages_in_category, get_external_links_batch, make_request, get_category_project_and_category_name
@@ -95,12 +96,13 @@ def index():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    category_url = request.form.get('category_url')
+    category_url = unquote(request.form.get('category_url'))
     depth = request.form.get('depth', type=int, default=0)
+    offset = request.form.get('offset', type=int, default=0)
     project, category_page = get_category_project_and_category_name(category_url)
     category_name = category_page.split(':', 1)[1]
 
-    task, task_status_code = asyncio.run(check_links(category_url, True, depth))
+    task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
 
     pages = []
     links = []
@@ -130,38 +132,50 @@ def submit():
 
 
 def get_url_parameters(args):
-    category_url = args.get('category_url')
-    get_subcategories = args.get('get_subcategories', type=bool, default=False)
+    category_url = unquote(args.get('category_url'))
+    offset = args.get('offset', type=int, default=0)
     depth = args.get('depth', type=int, default=0)
 
-    return category_url, get_subcategories, depth
+    return category_url, depth, offset
 
 
-async def category_pages(category_url, get_subcategories, depth):
-    pages = await get_pages_in_category(category_url, get_subcategories, depth, 0)
+async def category_pages(category_url, depth):
+    start_time = time.time()
+    pages = await get_pages_in_category(category_url, depth, 0)
     cleaned_pages = list(set([page['title'] for page in pages if page['ns'] != 14]))
 
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f'Total elapsed time: {elapsed_time:.2f} seconds')
     return cleaned_pages, 200
 
 
 @app.route('/category_pages', methods=['GET'])
 def trigger_category_pages():
-    category_url, get_subcategories, depth = get_url_parameters(request.args)
+    category_url, depth, offset = get_url_parameters(request.args)
     if not category_url:
         return jsonify({'error': 'Category URL parameter is required'}), 400
 
-    task, task_status_code = asyncio.run(category_pages(category_url, get_subcategories, depth))
+    task, task_status_code = asyncio.run(category_pages(category_url, depth))
 
     return task
 
 
-async def external_links(category_url, get_subcategories, depth):
-    page_titles, page_titles_status_code = await category_pages(category_url, get_subcategories, depth)
+async def external_links(category_url, depth):
+    start_time = time.time()
+    page_titles, page_titles_status_code = await category_pages(category_url, depth)
     if not page_titles:
         return {}, 400
     try:
         results = await get_external_links_batch(category_url, page_titles)
-        response_data = {title: links for title, links in results}
+        response_data = {}
+        for result_set in results:
+            for title, links in result_set.items():
+                response_data[title] = links
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f'Total elapsed time: {elapsed_time:.2f} seconds')
         return response_data, 200
     except Exception as e:
         return {}, 400
@@ -169,47 +183,82 @@ async def external_links(category_url, get_subcategories, depth):
 
 @app.route('/external_links', methods=['GET'])
 def trigger_external_links():
-    category_url, get_subcategories, depth = get_url_parameters(request.args)
+    category_url, depth, offset = get_url_parameters(request.args)
     if not category_url:
         return jsonify({'error': 'Category URL parameter is required'}), 400
 
-    task, task_status_code = asyncio.run(external_links(category_url, get_subcategories, depth))
+    task, task_status_code = asyncio.run(external_links(category_url, depth))
 
     return task
 
 
-async def check_links(category_url, get_subcategories, depth):
+async def count_external_links(category_url, depth):
+    page_titles, page_titles_status_code = await category_pages(category_url, depth)
+    if not page_titles:
+        return 0, 0
+    try:
+        results = await get_external_links_batch(category_url, page_titles)
+        response_data = 0
+        for result_set in results:
+            for title, links in result_set.items():
+                response_data += len(links)
+        return response_data, len(page_titles)
+    except Exception as e:
+        return 0, len(page_titles)
+
+
+@app.route('/count-links', methods=['POST'])
+def trigger_count_links():
+    data = request.json
+    category_url = unquote(data.get('category_url'))
+    depth = int(data.get('depth', 0))
+    try:
+        count, total_pages = asyncio.run(count_external_links(category_url, depth))
+        return jsonify({"external_link_count": count, "total_pages": total_pages})
+    except Exception as e:
+        return jsonify({"external_link_count": "-", "total_pages": "-"}), 500
+
+
+async def check_links(category_url, depth, offset):
     start_time = time.time()
-    urls, urls_status_code = await external_links(category_url, get_subcategories, depth)
+    urls_per_page, urls_status_code = await external_links(category_url, depth)
     headers = {'User-agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'}
+    urls = []
+    for page_title, url_list in urls_per_page.items():
+        urls += url_list
+
+    urls = list(set(urls))
 
     async with httpx.AsyncClient(verify=False, headers=headers, follow_redirects=True) as client:
-        response_data = {}
-        for page_title, page_links in urls.items():
-            broken_links = []
-            tasks = [asyncio.ensure_future(make_request(client, url)) for url in page_links]
-            results = await asyncio.gather(*tasks)
+        broken_links = []
+        tasks = [asyncio.ensure_future(make_request(client, url)) for url in urls[offset:offset+1000]]
+        results = await asyncio.gather(*tasks)
 
-            page_broken_links = [result for result in results if result['status_code'] != 200]
-            broken_links.extend(page_broken_links)
-            if broken_links:
-                response_data[page_title] = broken_links
+        page_broken_links = [result for result in results if result['status_code'] != 200]
+        broken_links.extend(page_broken_links)
 
     end_time = time.time()
     elapsed_time = end_time - start_time
+
     print(f'Total elapsed time: {elapsed_time:.2f} seconds')
-    return response_data, 200
+    return reconcile_results(urls_per_page, broken_links), 200
 
 
 @app.route('/check_links', methods=['GET'])
 def trigger_check_links():
-    category_url, get_subcategories, depth = get_url_parameters(request.args)
+    category_url, depth, offset = get_url_parameters(request.args)
     if not category_url:
         return jsonify({'error': 'Category URL parameter is required'}), 400
 
-    task, task_status_code = asyncio.run(check_links(category_url, get_subcategories, depth))
+    task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
 
     return task
+
+
+def reconcile_results(urls_per_page, broken_links):
+    for page, page_links in urls_per_page.items():
+        urls_per_page[page] = [link_response for link_response in broken_links if link_response["link"] in page_links]
+    return urls_per_page
 
 
 if __name__ == '__main__':

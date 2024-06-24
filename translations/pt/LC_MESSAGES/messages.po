@@ -1,13 +1,14 @@
 # Portuguese translations for Dead Link Scanner.
 # Copyright (C) 2024 Wiki Movimento Brasil
-# This file is distributed under the same license as the Dead Link Scanner project.
+# This file is distributed under the same license as the Dead Link Scanner
+# project.
 # Éder Porto <eder.porto@wmnobrasil.org>, 2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.0\n"
+"Project-Id-Version:  1.0\n"
 "Report-Msgid-Bugs-To: eder.porto@wmnobrasil.org\n"
-"POT-Creation-Date: 2024-06-17 21:05-0300\n"
+"POT-Creation-Date: 2024-06-23 23:10-0300\n"
 "PO-Revision-Date: 2024-06-17 21:05-0300\n"
 "Last-Translator: Éder Porto <eder.porto@wmnobrasil.org>\n"
 "Language: pt_BR\n"
@@ -18,23 +19,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: link_checker.py:90
+#: link_checker.py:96
 msgid "Bad request"
 msgstr "Requisição inválida"
 
-#: link_checker.py:92
+#: link_checker.py:98
 msgid "Unauthorized"
 msgstr "Não autorizado"
 
-#: link_checker.py:94
+#: link_checker.py:100
 msgid "Forbidden"
 msgstr "Proibido"
 
-#: link_checker.py:96
+#: link_checker.py:102
 msgid "Not found"
 msgstr "Não encontrado"
 
-#: link_checker.py:98
+#: link_checker.py:104
 msgid "Unable to connect"
 msgstr "Incapaz de conectar"
 
@@ -48,13 +49,13 @@ msgstr "Verificador de Ligações Mortas"
 
 #: templates/home.html:9
 msgid ""
-"This application is meant to return a list of pages in a given "
-"category of a Wikimedia Project, with the information of which "
-"external links are dead in each page."
+"This application is meant to return a list of pages in a given category "
+"of a Wikimedia Project, with the information of which external links are "
+"dead in each page."
 msgstr ""
-"Este aplicativo tem como objetivo retornar uma lista de páginas "
-"em uma  determinada categoria de um projeto Wikimedia, com a "
-"informação de quais ligações externas estão mortas em cada página"
+"Este aplicativo tem como objetivo retornar uma lista de páginas em uma  "
+"determinada categoria de um projeto Wikimedia, com a informação de quais "
+"ligações externas estão mortas em cada página"
 
 #: templates/home.html:10
 msgid ""
@@ -65,10 +66,11 @@ msgid ""
 " for the Outreachy initiative\">Outreachy project</a></b>."
 msgstr ""
 "Foi inspirado por um desejo da <b><a href=\"https://w.wiki/6o7Q\" "
-"title=\"Página MetaWiki da Lista de Desejos Tecnológicos da Lusofonia\">"
-"lista de Desejos Tecnológicos da Lusofonia</a></b> e foi parcialmente "
-"desenvolvido em um <b><a href=\"https://www.outreachy.org\" title=\"Página inicial "
-"para a iniciativa Outreachy\">projeto Outreachy</a></b>."
+"title=\"Página MetaWiki da Lista de Desejos Tecnológicos da "
+"Lusofonia\">lista de Desejos Tecnológicos da Lusofonia</a></b> e foi "
+"parcialmente desenvolvido em um <b><a href=\"https://www.outreachy.org\" "
+"title=\"Página inicial para a iniciativa Outreachy\">projeto "
+"Outreachy</a></b>."
 
 #: templates/home.html:13
 msgid "Category URL"
@@ -78,31 +80,49 @@ msgstr "URL da categoria"
 msgid "Type or paste the URL of the category page of a Wikimedia project"
 msgstr "Digite ou cole a URL da página da categoria de um projeto Wikimedia"
 
-#: templates/home.html:18
+#: templates/home.html:19
 msgid "Depth of subcategories"
 msgstr "Profundidade das subcategorias"
 
-#: templates/home.html:19
-msgid "Choose the depth of subcategories the tool should look.<br>The "
-"higher the number, the longer it takes to retrieve all external links."
-msgstr "Escolha a profundidade das subcategorias que a ferramenta deve buscar.<br>"
-"Quanto maior o número, mais tempo levará para recuperar todas as ligações externas."
+#: templates/home.html:20
+msgid ""
+"Choose the depth of subcategories the tool should look.<br>The higher the"
+" number, the longer it takes to retrieve all external links."
+msgstr ""
+"Escolha a profundidade das subcategorias que a ferramenta deve "
+"buscar.<br>Quanto maior o número, mais tempo levará para recuperar todas "
+"as ligações externas."
 
-#: templates/home.html:23
+#: templates/home.html:24
+msgid "Offset"
+msgstr "Deslocamento"
+
+#: templates/home.html:25
+msgid ""
+"This tool only checks 1000 URLs at a time. Choose an offset to get the "
+"'next 1000' until your finish collecting them all."
+msgstr ""
+"Esta ferramenta verifica somente 1000 URLs por vez. Escolha um "
+"deslocamento para recuperar as 'próximas 1000' até que tenha finalizado "
+"todas elas."
+
+#: templates/home.html:29
 msgid "Submit your request"
 msgstr "Envie sua solicitação"
 
-#: templates/home.html:24
-msgid "After submitting your request, please wait until it "
-"is finished before leaving this page."
-msgstr "Depois de enviar sua solicitação, aguarde até que ela "
-"seja concluída antes de sair desta página."
+#: templates/home.html:30
+msgid ""
+"After submitting your request, please wait until it is finished before "
+"leaving this page."
+msgstr ""
+"Depois de enviar sua solicitação, aguarde até que ela seja concluída "
+"antes de sair desta página."
 
-#: templates/home.html:25
+#: templates/home.html:31
 msgid "Submit"
 msgstr "Enviar"
 
-#: templates/home.html:35
+#: templates/home.html:41
 msgid ""
 "This application was developed by the <a href=\"https://w.wiki/Lrx\" "
 "title=\"MetaWiki page of the User Group Wiki Movimento Brasil\">Wiki "
@@ -114,12 +134,21 @@ msgid ""
 " license</a>."
 msgstr ""
 "Este aplicativo foi desenvolvido pelo <a href=\"https://w.wiki/Lrx\" "
-"title=\"Página MetaWiki do Grupo de Usuários Wiki Movimento Brasil\">"
-"grupo de usuários Wiki Movimento Brasil</a>.<br>Os textos são licenciados "
-"sob <a href=\"https://creativecommons.org/licenses/by-sa/4.0\" title=\"
-"Criative Commons Attribution-ShareALike 4.0 International\">CC BY-SA "
-"4.0</a>.<br>O código-fonte está licenciado sob a <a href=\"https://"
-"opensource.org/license/mit\" title=\"Licença MIT\">licença MIT</a>."
+"title=\"Página MetaWiki do Grupo de Usuários Wiki Movimento "
+"Brasil\">grupo de usuários Wiki Movimento Brasil</a>.<br>Os textos são "
+"licenciados sob <a href=\"https://creativecommons.org/licenses/by-"
+"sa/4.0\" title=\\Criative Commons Attribution-ShareALike 4.0 "
+"International\">CC BY-SA 4.0</a>.<br>O código-fonte está licenciado sob a"
+" <a href=\"https://opensource.org/license/mit\" title=\"Licença "
+"MIT\">licença MIT</a>."
+
+#: templates/home.html:51
+msgid "External links count"
+msgstr "Quantidade de ligações externas"
+
+#: templates/home.html:52
+msgid "Total pages"
+msgstr "Total de páginas"
 
 #: templates/navbar.html:12
 msgid "DLS"
@@ -136,3 +165,4 @@ msgstr "Sair"
 #: templates/navbar.html:24 templates/navbar.html:25
 msgid "Login"
 msgstr "Entrar"
+

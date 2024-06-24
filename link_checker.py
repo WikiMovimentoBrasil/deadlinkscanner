@@ -13,7 +13,7 @@ def get_category_project_and_category_name(category_url):
     return category_url.split('/wiki/', 1)
 
 
-async def get_pages_in_category(category_url, get_subcategories=False, depth=0, current_level=0):
+async def get_pages_in_category(category_url, depth=0, current_level=0):
     category_project, category_name = get_category_project_and_category_name(category_url)
     base_url = category_project + '/w/api.php'
 
@@ -34,12 +34,11 @@ async def get_pages_in_category(category_url, get_subcategories=False, depth=0, 
             data = await fetch_pages(session, base_url, params)
 
             category_members = data.get('query', {}).get('categorymembers', [])
-            if get_subcategories and current_level < depth:
+            if current_level < depth:
                 for member in category_members:
                     if member['ns'] == 14:
                         subcategory_url = category_project + "/wiki/" + member['title']
-                        subcategory_pages = await get_pages_in_category(subcategory_url, get_subcategories,
-                                                                        depth, current_level + 1)
+                        subcategory_pages = await get_pages_in_category(subcategory_url, depth, current_level + 1)
                         pages.extend(subcategory_pages)
                     else:
                         pages.append(member)
@@ -54,11 +53,11 @@ async def get_pages_in_category(category_url, get_subcategories=False, depth=0, 
     return pages
 
 
-async def fetch_external_links(category_project, page_title, session):
+async def fetch_external_links(category_project, page_titles, session):
     base_url = category_project + '/w/api.php'
     params = {
         'action': 'query',
-        'titles': page_title,
+        'titles': page_titles,
         'prop': 'extlinks',
         'format': 'json',
         'ellimit': 'max'
@@ -66,20 +65,27 @@ async def fetch_external_links(category_project, page_title, session):
 
     async with session.get(base_url, params=params) as response:
         data = await response.json()
-        page_id = next(iter(data['query']['pages'].keys()))  # Get the page ID
-        if '-1' in data['query']['pages'][page_id]:
-            return page_title, []  # No page found with this title
-        else:
-            ext_links = data['query']['pages'][page_id].get('extlinks', [])
-            return page_title, [link['*'] for link in ext_links]
+        pages_ids = data['query']['pages'].keys()
+        result_links = {}
+        for page_id in pages_ids:
+            if '-1' in data['query']['pages'][page_id]:
+                result_links[data['query']['pages'][page_id]["title"]] = []  # No page found with this title
+            else:
+                result_links[data['query']['pages'][page_id]["title"]] = [link["*"] for link in data['query']['pages'][page_id].get('extlinks', []) if "web.archive" not in link["*"]]
+        return result_links
 
 
 async def get_external_links_batch(category_url, page_titles):
     async with aiohttp.ClientSession() as session:
         category_project, category_name = get_category_project_and_category_name(category_url)
         tasks = []
-        for title in page_titles:
-            tasks.append(fetch_external_links(category_project, title, session))
+
+        def chunks(lst):
+            for i in range(0, len(lst), 50):
+                yield lst[i:i + 50]
+
+        for batch in chunks(page_titles):
+            tasks.append(fetch_external_links(category_project, "|".join(batch), session))
         results = await asyncio.gather(*tasks, return_exceptions=True)
         return results
 

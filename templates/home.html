@@ -13,11 +13,17 @@
                     <label class="field_label" for="category_url">{{ _("Category URL") }}*</label>
                     <span class="field_description">{{ _("Type or paste the URL of the category page of a Wikimedia project") }}</span>
                     <input class="cdx-text-input__input" type="url" name="category_url" id="category_url" aria-required="true" required />
+                    <span id="amount"></span>
                 </div>
                 <div class="form_field">
                     <label class="field_label" for="depth">{{ _("Depth of subcategories") }}*</label>
                     <span class="field_description">{{ _("Choose the depth of subcategories the tool should look.<br>The higher the number, the longer it takes to retrieve all external links.") }}</span>
                     <input id="depth" name="depth" class="cdx-text-input__input" type="number" min="0" max="2" value="0">
+                </div>
+                <div class="form_field">
+                    <label class="field_label" for="offset">{{ _("Offset") }}</label>
+                    <span class="field_description">{{ _("This tool only checks 1000 URLs at a time. Choose an offset to get the 'next 1000' until your finish collecting them all.") }}</span>
+                    <input id="offset" name="offset" class="cdx-text-input__input" type="number" min="0" value="0">
                 </div>
                 <div class="form_field">
                     <span class="field_label">{{ _('Submit your request') }}</span>
@@ -35,4 +41,29 @@
             {% trans %}This application was developed by the <a href="https://w.wiki/Lrx" title="MetaWiki page of the User Group Wiki Movimento Brasil">Wiki Movimento Brasil</a>.<br>Texts are licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0" title="Creative Commons Attribution-ShareALike 4.0 International">CC BY-SA 4.0</a>.<br>The source code is licensed under the <a href="https://opensource.org/license/mit" title="The MIT License">MIT license</a>.{% endtrans %}
         </p>
     </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        document.getElementById('category_url').addEventListener('input', async function() {
+            const categoryUrl = this.value;
+            const depth = document.getElementById('depth').value;
+            const url = "{{ url_for('trigger_count_links') }}";
+            const external_link_count = "{{ _('External links count') }}";
+            const total_pages_count = "{{ _('Total pages') }}";
+
+            if (categoryUrl) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ category_url: categoryUrl, depth: depth })
+                });
+
+                const result = await response.json();
+                document.getElementById('amount').innerText = external_link_count + `: ${result.external_link_count}. ` +
+                    total_pages_count + `: ${result.total_pages}.`;
+            }
+        });
+    </script>
 {% endblock %}

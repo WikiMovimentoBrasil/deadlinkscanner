@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-17 21:05-0300\n"
+"POT-Creation-Date: 2024-06-23 23:10-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: link_checker.py:90
+#: link_checker.py:96
 msgid "Bad request"
 msgstr ""
 
-#: link_checker.py:92
+#: link_checker.py:98
 msgid "Unauthorized"
 msgstr ""
 
-#: link_checker.py:94
+#: link_checker.py:100
 msgid "Forbidden"
 msgstr ""
 
-#: link_checker.py:96
+#: link_checker.py:102
 msgid "Not found"
 msgstr ""
 
-#: link_checker.py:98
+#: link_checker.py:104
 msgid "Unable to connect"
 msgstr ""
 
@@ -47,9 +47,9 @@ msgstr ""
 
 #: templates/home.html:9
 msgid ""
-"This application is meant to return a list of pages in a given "
-"category of a Wikimedia Project, with the information of which "
-"external links are dead in each page."
+"This application is meant to return a list of pages in a given category "
+"of a Wikimedia Project, with the information of which external links are "
+"dead in each page."
 msgstr ""
 
 #: templates/home.html:10
@@ -69,31 +69,41 @@ msgstr ""
 msgid "Type or paste the URL of the category page of a Wikimedia project"
 msgstr ""
 
-#: templates/home.html:18
+#: templates/home.html:19
 msgid "Depth of subcategories"
 msgstr ""
 
-#: templates/home.html:19
+#: templates/home.html:20
 msgid ""
 "Choose the depth of subcategories the tool should look.<br>The higher the"
 " number, the longer it takes to retrieve all external links."
 msgstr ""
 
-#: templates/home.html:23
+#: templates/home.html:24
+msgid "Offset"
+msgstr ""
+
+#: templates/home.html:25
+msgid ""
+"This tool only checks 1000 URLs at a time. Choose an offset to get the "
+"'next 1000' until your finish collecting them all."
+msgstr ""
+
+#: templates/home.html:29
 msgid "Submit your request"
 msgstr ""
 
-#: templates/home.html:24
+#: templates/home.html:30
 msgid ""
 "After submitting your request, please wait until it is finished before "
 "leaving this page."
 msgstr ""
 
-#: templates/home.html:25
+#: templates/home.html:31
 msgid "Submit"
 msgstr ""
 
-#: templates/home.html:35
+#: templates/home.html:41
 msgid ""
 "This application was developed by the <a href=\"https://w.wiki/Lrx\" "
 "title=\"MetaWiki page of the User Group Wiki Movimento Brasil\">Wiki "
@@ -103,6 +113,14 @@ msgid ""
 "4.0</a>.<br>The source code is licensed under the <a "
 "href=\"https://opensource.org/license/mit\" title=\"The MIT License\">MIT"
 " license</a>."
+msgstr ""
+
+#: templates/home.html:51
+msgid "External links count"
+msgstr ""
+
+#: templates/home.html:52
+msgid "Total pages"
 msgstr ""
 
 #: templates/navbar.html:12
