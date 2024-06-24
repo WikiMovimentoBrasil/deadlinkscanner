@@ -1,5 +1,7 @@
 Flask[async]
+Flask-SQLAlchemy
 pyyaml
+pymysql
 flask_babel
 httpx
 requests

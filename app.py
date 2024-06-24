@@ -6,16 +6,41 @@ import time
 import asyncio
 import pandas as pd
 import tempfile
+import configparser
+from datetime import datetime
 from urllib.parse import unquote
 from flask import Flask, jsonify, request, render_template, send_file, redirect, url_for, session, flash
 from flask_babel import Babel
+from flask_sqlalchemy import SQLAlchemy
 from link_checker import get_pages_in_category, get_external_links_batch, make_request, get_category_project_and_category_name
 
 __dir__ = os.path.dirname(__file__)
 app = Flask(__name__)
 app.config.update(yaml.safe_load(open(os.path.join(__dir__, 'config.yaml'))))
-
 BABEL = Babel(app)
+
+HOME = os.environ.get('HOME') or ""
+replica_path = HOME + '/replica.my.cnf'
+if os.path.exists(replica_path):
+    config = configparser.ConfigParser()
+    config.read(replica_path)
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{config['client']['user']}:{config['client']['password']}@tools.db.svc.wikimedia.cloud/s55915__deadlinkscanner"
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(HOME, 'database.db')
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+
+class LogQuery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150))
+    category_url = db.Column(db.String(150))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    depth = db.Column(db.Integer, default=0)
+    offset = db.Column(db.Integer, default=0)
+    type_of_query = db.Column(db.String(50))
 
 
 def get_locale(lang=None):
@@ -103,7 +128,7 @@ def submit():
         project, category_page = get_category_project_and_category_name(category_url)
         category_name = category_page.split(':', 1)[1]
 
-        task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
+        task, task_status_code = asyncio.run(check_links(username, category_url, depth, offset))
 
         pages = []
         links = []
@@ -161,6 +186,12 @@ def trigger_category_pages():
         if not category_url:
             return jsonify({'error': 'Category URL parameter is required'}), 400
 
+        new_log = LogQuery(username=username, category_url=category_url, depth=depth, offset=offset, type_of_query="category_pages")
+        try:
+            db.session.add(new_log)
+            db.session.commit()
+        except:
+            pass
         task, task_status_code = asyncio.run(category_pages(category_url, depth))
 
         return task
@@ -196,6 +227,12 @@ def trigger_external_links():
         if not category_url:
             return jsonify({'error': 'Category URL parameter is required'}), 400
 
+        new_log = LogQuery(username=username, category_url=category_url, depth=depth, offset=offset, type_of_query="external_links")
+        try:
+            db.session.add(new_log)
+            db.session.commit()
+        except:
+            pass
         task, task_status_code = asyncio.run(external_links(category_url, depth))
 
         return task
@@ -228,7 +265,15 @@ def trigger_count_links():
         return jsonify({"external_link_count": "-", "total_pages": "-"}), 500
 
 
-async def check_links(category_url, depth, offset):
+async def check_links(username, category_url, depth, offset):
+    new_log = LogQuery(username=username, category_url=category_url, depth=depth, offset=offset,
+                       type_of_query="check_links")
+    try:
+        db.session.add(new_log)
+        db.session.commit()
+    except:
+        pass
+
     start_time = time.time()
     urls_per_page, urls_status_code = await external_links(category_url, depth)
     headers = {'User-agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'}
@@ -263,7 +308,7 @@ def trigger_check_links():
         if not category_url:
             return jsonify({'error': 'Category URL parameter is required'}), 400
 
-        task, task_status_code = asyncio.run(check_links(category_url, depth, offset))
+        task, task_status_code = asyncio.run(check_links(username, category_url, depth, offset))
 
         return task
 
@@ -275,4 +320,6 @@ def reconcile_results(urls_per_page, broken_links):
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run()
